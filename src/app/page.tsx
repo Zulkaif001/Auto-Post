@@ -1,7 +1,8 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface Post {
   id: string;
@@ -18,7 +19,16 @@ function getGreeting(): string {
 }
 
 export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
   const [postText, setPostText] = useState("");
   const [posting, setPosting] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -30,6 +40,14 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<
     "published" | "drafts"
   >("published");
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      showToast(`LinkedIn sign-in failed: ${error}`, "error");
+      window.history.replaceState({}, "", "/");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const savedPosts = localStorage.getItem("autopost_posts");

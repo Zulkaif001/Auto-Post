@@ -13,9 +13,16 @@ const authOptions: NextAuthOptions = {
           scope: "openid profile email w_member_social",
         },
       },
+      token: {
+        url: "https://www.linkedin.com/oauth/v2/accessToken",
+      },
+      userinfo: {
+        url: "https://api.linkedin.com/v2/userinfo",
+      },
       clientId: process.env.LINKEDIN_CLIENT_ID,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
       checks: ["state"],
+      idToken: true,
       profile(profile) {
         return {
           id: profile.sub,
@@ -39,6 +46,9 @@ const authOptions: NextAuthOptions = {
       (session as any).linkedinId = token.linkedinId;
       return session;
     },
+  },
+  pages: {
+    error: "/",
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: true,
