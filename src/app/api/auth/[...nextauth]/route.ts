@@ -6,21 +6,16 @@ const authOptions: NextAuthOptions = {
       id: "linkedin",
       name: "LinkedIn",
       type: "oauth",
+      wellKnown:
+        "https://www.linkedin.com/oauth/.well-known/openid-configuration",
       authorization: {
-        url: "https://www.linkedin.com/oauth/v2/authorization",
         params: {
           scope: "openid profile email w_member_social",
-          response_type: "code",
         },
-      },
-      token: {
-        url: "https://www.linkedin.com/oauth/v2/accessToken",
-      },
-      userinfo: {
-        url: "https://api.linkedin.com/v2/userinfo",
       },
       clientId: process.env.LINKEDIN_CLIENT_ID,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+      checks: ["state"],
       profile(profile) {
         return {
           id: profile.sub,
@@ -45,9 +40,8 @@ const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  pages: {
-    signIn: "/",
-  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: true,
 };
 
 const handler = NextAuth(authOptions);
